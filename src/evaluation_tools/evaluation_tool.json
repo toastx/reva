@@ -6,9 +6,16 @@
     "required": [
       "summary",
       "outcome",
-      "lead_quality"
+      "lead_quality",
+      "call_score"
     ],
     "properties": {
+      "call_score": {
+        "type": "NUMBER",
+        "minimum": 1,
+        "maximum": 10,
+        "description": "Overall call quality score (1-10). 10=perfect (full requirements + hot lead), 1=abrupt/no engagement"
+      },
       "outcome": {
         "enum": [
           "viewing_scheduled",
@@ -16,16 +23,10 @@
           "callback_requested",
           "requirements_gathered",
           "not_interested",
+          "incomplete_abrupt",
           "incomplete"
         ],
-        "type": "STRING",
-        "description": "Final call outcome"
-      },
-      "summary": {
-        "type": "STRING",
-        "maxLength": "400",
-        "minLength": "20",
-        "description": "Brief summary of client requirements and discussion"
+        "type": "STRING"
       },
       "lead_quality": {
         "enum": [
@@ -34,80 +35,38 @@
           "cold",
           "unqualified"
         ],
+        "type": "STRING"
+      },
+      "summary": {
         "type": "STRING",
-        "description": "Quality and readiness of the lead"
+        "maxLength": 200,
+        "minLength": 20,
+        "description": "Concise summary: key requirements + discussion highlights (NO noise/fluff)"
       },
-      "property_type": {
-        "type": "STRING",
-        "description": "Apartment, villa, PG, or independent house"
+      "requirements": {
+        "type": "OBJECT",
+        "properties": {
+          "location": {"type": "STRING"},
+          "property_type": {"type": "STRING"},
+          "bhk": {"type": "STRING"},
+          "purpose": {"enum": ["rent", "buy", "not_specified"], "type": "STRING"},
+          "budget_range": {"type": "STRING"},
+          "occupancy_type": {"type": "STRING"},
+          "diet_preference": {"type": "STRING"}
+        },
+        "description": "Structured requirements (only filled fields)"
       },
-      "purpose": {
-        "enum": [
-          "rent",
-          "buy",
-          "not_specified"
-        ],
-        "type": "STRING",
-        "description": "Rent or purchase"
-      },
-      "bhk": {
-        "type": "STRING",
-        "description": "BHK requirement (Studio, 1BHK, 2BHK, etc.)"
-      },
-      "budget_range": {
-        "type": "STRING",
-        "description": "Budget range in rupees"
-      },
-      "location_preference": {
-        "type": "STRING",
-        "description": "Preferred locations or areas"
-      },
-      "occupancy_type": {
-        "enum": [
-          "family",
-          "bachelor",
-          "married_couple",
-          "unmarried_couple",
-          "shared",
-          "not_specified"
-        ],
-        "type": "STRING",
-        "description": "Who will occupy the property"
-      },
-      "lift_required": {
-        "type": "BOOLEAN",
-        "description": "Whether lift is required"
-      },
-      "elderly_friendly": {
-        "type": "BOOLEAN",
-        "description": "Whether property needs to be elderly-friendly"
-      },
-      "diet_preference": {
-        "enum": [
-          "vegetarian",
-          "non_vegetarian",
-          "no_preference"
-        ],
-        "type": "STRING",
-        "description": "Food habits of occupants"
-      },
-      "roommates": {
-        "type": "BOOLEAN",
-        "description": "Whether looking for shared accommodation"
-      },
-      "travel_convenience": {
-        "type": "STRING",
-        "description": "Proximity requirements for work, metro, schools, etc."
-      },
-      "timeline": {
-        "type": "STRING",
-        "description": "When they need the property"
+      "matched_properties": {
+        "type": "ARRAY",
+        "items": {
+          "type": "STRING"
+        },
+        "description": "Property IDs suggested (e.g., [\"OMR001\", \"VEL002\"])"
       },
       "follow_up_required": {
-        "type": "BOOLEAN",
-        "description": "Whether follow-up is needed"
+        "type": "BOOLEAN"
       }
     }
   },
-  "description": "Summarize the real estate inquiry call with detailed requirements"
+  "description": "Extract clean real estate call outcomes. Focus on score + requirements only. Ignore chit-chat."
 }

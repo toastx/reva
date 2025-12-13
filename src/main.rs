@@ -6,9 +6,11 @@ use axum::{
     Router,
 };
 use std::net::SocketAddr;
+use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
 async fn main() {
+    
     dotenv::dotenv().ok();
     let client = reqwest::Client::new();
     
@@ -17,7 +19,14 @@ async fn main() {
         .route("/list", get(functions::list_calls))
         .route("/detail/{call_id}", get(functions::call_detail))
         .route("/recording-url/{call_id}", get(functions::recording_url))
-        .with_state(client);
+        .with_state(client)
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods(Any)
+                .allow_headers(Any)
+        );
+
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     println!("✅ Server running on http://{}", addr);

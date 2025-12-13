@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Manager Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            min-height: 100vh;
+            padding: 24px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #1a1a1a;
+            padding: 24px 28px;
+            border-radius: 16px;
+            border: 1px solid #2a2a2a;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #e94560;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d63050;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid #333;
+        }
+
+        .btn-secondary:hover {
+            background: #252525;
+            border-color: #444;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calls-container {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .calls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-box {
+            padding: 10px 16px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            font-size: 14px;
+            width: 280px;
+            max-width: 100%;
+            background: #0f0f0f;
+            color: #e0e0e0;
+        }
+
+        .search-box::placeholder {
+            color: #555;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        .calls-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .calls-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .calls-table thead {
+            background: #141414;
+        }
+
+        .calls-table th,
+        .calls-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .calls-table th {
+            font-weight: 500;
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calls-table td {
+            color: #e0e0e0;
+        }
+
+        .calls-table tbody tr {
+            transition: background 0.15s ease;
+            cursor: pointer;
+        }
+
+        .calls-table tbody tr:hover {
+            background: #222;
+        }
+
+        .calls-table code {
+            background: #0f0f0f;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #e94560;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-completed {
+            background: rgba(72, 187, 120, 0.15);
+            color: #48bb78;
+        }
+
+        .status-in-progress {
+            background: rgba(237, 181, 65, 0.15);
+            color: #edb541;
+        }
+
+        .status-failed {
+            background: rgba(233, 69, 96, 0.15);
+            color: #e94560;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 2px solid #2a2a2a;
+            border-top: 2px solid #e94560;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid #2a2a2a;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .close-btn {
+            background: #252525;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #888;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            background: #333;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section h3 {
+            color: #fff;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .detail-item {
+            padding: 12px;
+            background: #141414;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #e0e0e0;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 12px;
+            border-radius: 8px;
+        }
+
+        .error-message {
+            background: rgba(233, 69, 96, 0.1);
+            color: #e94560;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid rgba(233, 69, 96, 0.2);
+        }
+
+        .success-message {
+            background: rgba(72, 187, 120, 0.1);
+            color: #48bb78;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .calls-table {
+                font-size: 13px;
+            }
+
+            .calls-table th,
+            .calls-table td {
+                padding: 10px 8px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📞 Call Manager Dashboard</h1>
+            <p class="subtitle">Manage and monitor your API calls</p>
+        </header>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="action-bar">
+            <button class="btn-primary" onclick="makeCall()">
+                <span>📞</span> Make New Call
+            </button>
+            <button class="btn-secondary" onclick="loadCalls()">
+                <span>🔄</span> Refresh
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCalls">-</div>
+                <div class="stat-label">Total Calls</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedCalls">-</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="inProgressCalls">-</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="failedCalls">-</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="calls-container">
+            <div class="calls-header">
+                <h2>Recent Calls</h2>
+                <input type="text" class="search-box" placeholder="Search by call ID or phone..." id="searchBox" onkeyup="filterCalls()">
+            </div>
+
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>Loading calls...</p>
+            </div>
+
+            <div class="calls-table-wrapper">
+                <table class="calls-table" id="callsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Call ID</th>
+                            <th>Phone Number</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="callsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Call Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:3000';
+        let allCalls = [];
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        async function makeCall() {
+            try {
+                const response = await fetch(`${API_BASE}/call`, {
+                    method: 'GET'
+                });
+                
+                if (!response.ok) throw new Error('Failed to make call');
+                
+                const data = await response.json();
+                showSuccess(`Call initiated successfully! Call ID: ${data.data.id}`);
+                setTimeout(() => loadCalls(), 2000);
+            } catch (error) {
+                showError('Error making call: ' + error.message);
+            }
+        }
+
+        async function loadCalls() {
+            try {
+                document.getElementById('loadingIndicator').style.display = 'block';
+                document.getElementById('callsTable').style.display = 'none';
+
+                const response = await fetch(`${API_BASE}/list`);
+                if (!response.ok) throw new Error('Failed to load calls');
+                
+                const data = await response.json();
+                const callsList = data.data?.results || [];
+                
+                // Fetch detailed information and recording URL for each call
+                allCalls = await Promise.all(
+                    callsList.map(async (call) => {
+                        try {
+                            const [detailResponse, recordingResponse] = await Promise.all([
+                                fetch(`${API_BASE}/detail/${call.id}`),
+                                fetch(`${API_BASE}/recording-url/${call.id}`)
+                            ]);
+                            
+                            let callData = { ...call };
+                            
+                            if (detailResponse.ok) {
+                                const detailData = await detailResponse.json();
+                                callData.details = detailData.data;
+                            }
+                            
+                            if (recordingResponse.ok) {
+                                const recordingData = await recordingResponse.json();
+                                callData.recording_url = recordingData.data?.recording_url;
+                            }
+                            
+                            return callData;
+                        } catch (error) {
+                            console.error(`Failed to fetch details for ${call.call_id}:`, error);
+                            return call;
+                        }
+                    })
+                );
+                
+                updateStats(allCalls);
+                displayCalls(allCalls);
+                
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('callsTable').style.display = 'table';
+            } catch (error) {
+                showError('Error loading calls: ' + error.message);
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        }
+
+        function updateStats(calls) {
+            document.getElementById('totalCalls').textContent = calls.length;
+            
+            let completed = 0, inProgress = 0, failed = 0;
+            
+            calls.forEach(call => {
+                const status = call.status.toLowerCase();
+                if (status === 'completed') completed++;
+                else if (status.includes('progress')) inProgress++;
+                else failed++;
+            });
+            
+            document.getElementById('completedCalls').textContent = completed;
+            document.getElementById('inProgressCalls').textContent = inProgress;
+            document.getElementById('failedCalls').textContent = failed;
+        }
+
+        function displayCalls(calls) {
+            const tbody = document.getElementById('callsTableBody');
+            tbody.innerHTML = '';
+
+            if (calls.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #555;">No calls found</td></tr>';
+                return;
+            }
+
+            calls.forEach(call => {
+                const row = document.createElement('tr');
+                row.onclick = () => viewCallDetail(call.call_id);
+                
+                const statusClass = 
+                    call.status.toLowerCase() === 'completed' ? 'status-completed' :
+                    call.status.toLowerCase().includes('progress') ? 'status-in-progress' :
+                    'status-failed';
+
+                row.innerHTML = `
+                    <td><code>${call.call_id}</code></td>
+                    <td>${call.phone_number}</td>
+                    <td><span class="status-badge ${statusClass}">${call.status}</span></td>
+                    <td>${new Date(call.created).toLocaleString()}</td>
+                    <td>
+                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="event.stopPropagation(); viewCallDetail('${call.call_id}')">
+                            View Details
+                        </button>
+                        ${call.recording_url ? `
+                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-left: 6px;" onclick="event.stopPropagation(); playAudio('${call.recording_url}')">
+                            🎵 Play
+                        </button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterCalls() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = allCalls.filter(call => 
+                call.call_id.toLowerCase().includes(searchTerm) ||
+                call.phone_number.includes(searchTerm)
+            );
+            displayCalls(filtered);
+        }
+
+        async function viewCallDetail(callId) {
+            try {
+                const modal = document.getElementById('detailModal');
+                const modalBody = document.getElementById('modalBody');
+                
+                modalBody.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading details...</p></div>';
+                modal.classList.add('active');
+
+                // Check if we already have the details in cache
+                const cachedCall = allCalls.find(c => c.call_id === callId);
+                
+                let detail, recordingUrl;
+                
+                if (cachedCall?.details) {
+                    // Use cached details
+                    detail = { data: cachedCall.details };
+                    recordingUrl = cachedCall.recording_url;
+                } else {
+                    // Fetch fresh details
+                    const detailResponse = await fetch(`${API_BASE}/detail/${callId}`);
+                    if (!detailResponse.ok) throw new Error('Failed to load call details');
+                    detail = await detailResponse.json();
+                    
+                    // Fetch recording
+                    try {
+                        const recordingResponse = await fetch(`${API_BASE}/recording-url/${callId}`);
+                        if (recordingResponse.ok) {
+                            const recording = await recordingResponse.json();
+                            recordingUrl = recording.data?.recording_url;
+                        }
+                    } catch (err) {
+                        console.error('Failed to fetch recording:', err);
+                    }
+                }
+
+                const callData = detail.data;
+                const callDetails = callData.call_details;
+
+                modalBody.innerHTML = `
+                    ${callDetails.callSummaryData ? `
+                    <div class="detail-section">
+                        <h3>📝 Call Summary</h3>
+                        <div style="background: #141414; padding: 16px; border-radius: 10px; border: 1px solid #2a2a2a;">
+                            <p style="color: #ccc; line-height: 1.6; white-space: pre-wrap;">${typeof callDetails.callSummaryData === 'string' ? callDetails.callSummaryData : JSON.stringify(callDetails.callSummaryData, null, 2)}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div class="detail-section">
+                        <h3>Basic Information</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Call ID</div>
+                                <div class="detail-value">${callData.call_id}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Phone Number</div>
+                                <div class="detail-value">${callData.phone_number}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Status</div>
+                                <div class="detail-value">${callData.status}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Created</div>
+                                <div class="detail-value">${new Date(callData.created).toLocaleString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Exotel ID</div>
+                                <div class="detail-value">${callData.exotel_id || 'N/A'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${recordingUrl ? `
+                    <div class="detail-section">
+                        <h3>🎵 Recording</h3>
+                        <audio controls class="audio-player" src="${recordingUrl}"></audio>
+                    </div>
+                    ` : ''}
+
+                    <div class="detail-section">
+                        <h3>📊 Call Statistics</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Events</div>
+                                <div class="detail-value">${callDetails.events?.length || 0}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Tool Calls</div>
+                                <div class="detail-value">${callDetails.toolCalls?.length || 0}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Total Tokens</div>
+                                <div class="detail-value">${callDetails.usageMetadata?.totalTokenCount || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Prompt Tokens</div>
+                                <div class="detail-value">${callDetails.usageMetadata?.promptTokenCount || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Termination Reason</div>
+                                <div class="detail-value">${callDetails.terminationReason || 'N/A'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Termination Source</div>
+                                <div class="detail-value">${callDetails.terminationSource || 'N/A'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${callDetails.toolCalls?.length > 0 ? `
+                    <div class="detail-section">
+                        <h3>🔧 Tool Calls</h3>
+                        <div style="max-height: 200px; overflow-y: auto; background: #141414; padding: 12px; border-radius: 10px; border: 1px solid #2a2a2a;">
+                            ${callDetails.toolCalls.map(tc => `
+                                <div style="margin-bottom: 8px; padding: 10px; background: #1a1a1a; border-radius: 8px; border: 1px solid #2a2a2a;">
+                                    <strong style="color: #e94560;">${tc.toolName}</strong> <span style="color: #666;">- ${new Date(tc.timestamp).toLocaleString()}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    ${callDetails.transcriptionData?.transcripts?.length > 0 ? `
+                    <div class="detail-section">
+                        <h3>💬 Transcripts</h3>
+                        <div style="max-height: 300px; overflow-y: auto; background: #141414; padding: 12px; border-radius: 10px; border: 1px solid #2a2a2a;">
+                            ${callDetails.transcriptionData.transcripts.map(t => `
+                                <p style="margin-bottom: 8px; padding: 12px; background: #1a1a1a; border-radius: 8px; border-left: 3px solid ${t.role === 'agent' ? '#e94560' : '#48bb78'};">
+                                    <strong style="color: ${t.role === 'agent' ? '#e94560' : '#48bb78'};">${(t.role || 'Unknown').toUpperCase()}:</strong><br/>
+                                    <span style="margin-top: 6px; display: block; color: #ccc;">${t.text || JSON.stringify(t)}</span>
+                                </p>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    ${callDetails.phaseHistory?.length > 0 ? `
+                    <div class="detail-section">
+                        <h3>📈 Phase History</h3>
+                        <div style="max-height: 200px; overflow-y: auto; background: #141414; padding: 12px; border-radius: 10px; border: 1px solid #2a2a2a;">
+                            ${callDetails.phaseHistory.map(ph => `
+                                <div style="margin-bottom: 8px; padding: 10px; background: #1a1a1a; border-radius: 8px; border: 1px solid #2a2a2a;">
+                                    <strong style="color: #e94560;">${ph.from}</strong> <span style="color: #666;">→</span> <strong style="color: #48bb78;">${ph.to}</strong> <span style="color: #555;">at ${new Date(ph.timestamp).toLocaleString()}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+            } catch (error) {
+                showError('Error loading call details: ' + error.message);
+                closeModal();
+            }
+        }
+
+        function playAudio(url) {
+            const audio = new Audio(url);
+            audio.play().catch(err => {
+                showError('Failed to play audio: ' + err.message);
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Close modal on background click
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') closeModal();
+        });
+
+        // Load calls on page load
+        loadCalls();
+    </script>
+</body>
+</html>
