@@ -3,15 +3,15 @@ use serde_json::Value;
 
 // ============ MAKE CALL STRUCTS ============
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct MakeCallRequest {
     pub prompt: String,
     pub evaluation_tool: Value,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub vad_engine: Option<Value>,
+    pub vad_engine: Option<String>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct MakeCallResponse {
     pub data: CallData,
     pub status: String,
@@ -19,7 +19,7 @@ pub struct MakeCallResponse {
     pub action_code: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct CallData {
     pub id: u64,
     pub message: String,
@@ -27,7 +27,7 @@ pub struct CallData {
 
 // ============ LIST CALLS STRUCTS ============
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct ListCallsResponse {
     pub data: ListCallsData,
     pub status: String,
@@ -35,7 +35,7 @@ pub struct ListCallsResponse {
     pub action_code: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct ListCallsData {
     pub count: u32,
     pub next: Option<String>,
@@ -43,7 +43,7 @@ pub struct ListCallsData {
     pub results: Vec<CallItem>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct CallItem {
     pub id: u64,
     pub call_id: String,
@@ -54,7 +54,7 @@ pub struct CallItem {
 
 // ============ CALL DETAIL STRUCTS ============
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct CallDetailResponse {
     pub data: CallDetailData,
     pub status: String,
@@ -62,7 +62,7 @@ pub struct CallDetailResponse {
     pub action_code: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct CallDetailData {
     pub id: u64,
     pub call_id: String,
@@ -75,7 +75,7 @@ pub struct CallDetailData {
     pub call_details: CallDetails,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct CallDetails {
     #[serde(rename = "callId")]
     pub call_id: String,
@@ -87,34 +87,34 @@ pub struct CallDetails {
     #[serde(rename = "phaseHistory")]
     pub phase_history: Vec<PhaseHistory>,
     #[serde(rename = "usageMetadata")]
-    pub usage_metadata: UsageMetadata,
+    pub usage_metadata: Option<UsageMetadata>,  // Changed to Option
     #[serde(rename = "callSummaryData")]
-    pub call_summary_data: Value,
+    pub call_summary_data: Option<Value>,  // Changed to Option
     #[serde(rename = "callOutcomesData")]
-    pub call_outcomes_data: Value,
+    pub call_outcomes_data: Option<Value>,  // Changed to Option
     #[serde(rename = "terminationReason")]
-    pub termination_reason: String,
+    pub termination_reason: Option<String>,  // Changed to Option
     #[serde(rename = "terminationSource")]
-    pub termination_source: String,
+    pub termination_source: Option<String>,  // Changed to Option
     #[serde(rename = "transcriptionData")]
     pub transcription_data: TranscriptionData,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Event {
     pub data: Value,
     pub event: String,
     pub timestamp: i64,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct ToolCall {
     #[serde(rename = "toolName")]
     pub tool_name: String,
     pub timestamp: i64,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct PhaseHistory {
     pub to: String,
     pub from: String,
@@ -122,7 +122,7 @@ pub struct PhaseHistory {
     pub timestamp: i64,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct UsageMetadata {
     #[serde(rename = "totalTokenCount")]
     pub total_token_count: u32,
@@ -132,14 +132,14 @@ pub struct UsageMetadata {
     pub prompt_tokens_details: Vec<TokenDetail>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct TokenDetail {
     pub modality: String,
     #[serde(rename = "tokenCount")]
     pub token_count: u32,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct TranscriptionData {
     pub transcripts: Vec<Value>,
     #[serde(rename = "interruptionTimestamps")]
@@ -150,9 +150,7 @@ pub struct TranscriptionData {
     pub generation_complete_timestamps: Vec<i64>,
 }
 
-// ============ RECORDING URL STRUCTS ============
-
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct RecordingUrlResponse {
     pub data: RecordingUrlData,
     pub status: String,
@@ -160,7 +158,7 @@ pub struct RecordingUrlResponse {
     pub action_code: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct RecordingUrlData {
-    pub recording_url: String,
+    pub recording_url: Option<String>,  // Changed to Option
 }
