@@ -1,0 +1,113 @@
+{
+  "name": "call_outcomes",
+  "behavior": "BLOCKING",
+  "parameters": {
+    "type": "OBJECT",
+    "required": [
+      "summary",
+      "outcome",
+      "lead_quality"
+    ],
+    "properties": {
+      "outcome": {
+        "enum": [
+          "viewing_scheduled",
+          "property_details_sent",
+          "callback_requested",
+          "requirements_gathered",
+          "not_interested",
+          "incomplete"
+        ],
+        "type": "STRING",
+        "description": "Final call outcome"
+      },
+      "summary": {
+        "type": "STRING",
+        "maxLength": "400",
+        "minLength": "20",
+        "description": "Brief summary of client requirements and discussion"
+      },
+      "lead_quality": {
+        "enum": [
+          "hot",
+          "warm",
+          "cold",
+          "unqualified"
+        ],
+        "type": "STRING",
+        "description": "Quality and readiness of the lead"
+      },
+      "property_type": {
+        "type": "STRING",
+        "description": "Apartment, villa, PG, or independent house"
+      },
+      "purpose": {
+        "enum": [
+          "rent",
+          "buy",
+          "not_specified"
+        ],
+        "type": "STRING",
+        "description": "Rent or purchase"
+      },
+      "bhk": {
+        "type": "STRING",
+        "description": "BHK requirement (Studio, 1BHK, 2BHK, etc.)"
+      },
+      "budget_range": {
+        "type": "STRING",
+        "description": "Budget range in rupees"
+      },
+      "location_preference": {
+        "type": "STRING",
+        "description": "Preferred locations or areas"
+      },
+      "occupancy_type": {
+        "enum": [
+          "family",
+          "bachelor",
+          "married_couple",
+          "unmarried_couple",
+          "shared",
+          "not_specified"
+        ],
+        "type": "STRING",
+        "description": "Who will occupy the property"
+      },
+      "lift_required": {
+        "type": "BOOLEAN",
+        "description": "Whether lift is required"
+      },
+      "elderly_friendly": {
+        "type": "BOOLEAN",
+        "description": "Whether property needs to be elderly-friendly"
+      },
+      "diet_preference": {
+        "enum": [
+          "vegetarian",
+          "non_vegetarian",
+          "no_preference"
+        ],
+        "type": "STRING",
+        "description": "Food habits of occupants"
+      },
+      "roommates": {
+        "type": "BOOLEAN",
+        "description": "Whether looking for shared accommodation"
+      },
+      "travel_convenience": {
+        "type": "STRING",
+        "description": "Proximity requirements for work, metro, schools, etc."
+      },
+      "timeline": {
+        "type": "STRING",
+        "description": "When they need the property"
+      },
+      "follow_up_required": {
+        "type": "BOOLEAN",
+        "description": "Whether follow-up is needed"
+      }
+    }
+  },
+  "description": "Summarize the real estate inquiry call with detailed requirements"
+}
